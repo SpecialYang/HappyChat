@@ -11,6 +11,8 @@ import com.specialyang.handler.server.IMIdleStateHandler;
 import com.specialyang.packet.LoginRequestPacket;
 import com.specialyang.packet.LogoutResponsePacket;
 import com.specialyang.packet.MessageRequestPacket;
+import com.specialyang.serializer.Serializer;
+import com.specialyang.serializer.SerializerInit;
 import com.specialyang.util.LogUtil;
 import com.specialyang.util.LoginUtil;
 import com.specialyang.util.SessionUtil;
@@ -37,11 +39,13 @@ public class NettyClient {
     private static final String HOST = "127.0.0.1";
     private static int PORT = 8000;
     private static final int MAX_RETRY = 5;
+    private static String serializerName = "kryo";
 
     public static void main(String[] args) throws InterruptedException {
+
+        SerializerInit.loadSpiSupport(serializerName);
         Bootstrap bootstrap = new Bootstrap();
         NioEventLoopGroup client = new NioEventLoopGroup();
-
         bootstrap
                 //指定线程模型
                 .group(client)

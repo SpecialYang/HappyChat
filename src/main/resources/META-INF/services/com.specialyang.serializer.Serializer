@@ -1,0 +1,2 @@
+com.specialyang.serializer.JSONSerializer
+com.specialyang.serializer.KryoSerializer

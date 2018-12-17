@@ -4,6 +4,7 @@ import com.specialyang.enumeration.Command;
 import com.specialyang.enumeration.SerializerAlgorithm;
 import com.specialyang.packet.*;
 import com.specialyang.serializer.JSONSerializer;
+import com.specialyang.serializer.KryoSerializer;
 import com.specialyang.serializer.Serializer;
 import io.netty.buffer.ByteBuf;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ public class PacketCodeC {
     public static final PacketCodeC INSTANCE = new PacketCodeC();
     private final Map<Enum<Command>, Class<? extends Packet>> packetTypeMap;
     private final Map<Enum<SerializerAlgorithm>, Serializer> serializerMap;
+
+    private Serializer serializer;
 
     private PacketCodeC() {
         packetTypeMap = new HashMap<>();
@@ -41,6 +44,7 @@ public class PacketCodeC {
 
         serializerMap = new HashMap<>();
         serializerMap.put(SerializerAlgorithm.JSON, new JSONSerializer());
+        serializerMap.put(SerializerAlgorithm.KRYO, new KryoSerializer());
     }
 
     /**
@@ -50,11 +54,11 @@ public class PacketCodeC {
      * @return
      */
     public ByteBuf encode(ByteBuf byteBuf, Packet packet) {
-        byte[] bytes = Serializer.DEFAULT.serializer(packet);
+        byte[] bytes = serializer.serializer(packet);
         //填充各字段
         byteBuf.writeInt(MAGIC_NUMBER);
         byteBuf.writeByte(packet.getVersion());
-        byteBuf.writeByte(Serializer.DEFAULT.getSerializerAlgorithm());
+        byteBuf.writeByte(serializer.getSerializerAlgorithm());
         byteBuf.writeByte(packet.getCommand());
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);
@@ -90,6 +94,14 @@ public class PacketCodeC {
             return serializer.deserializer(requestPacket, bytes);
         }
         return null;
+    }
+
+    /**
+     * 设置序列化器
+     * @param serializer
+     */
+    public void setSerializer(Serializer serializer) {
+        this.serializer = serializer;
     }
 
     /**

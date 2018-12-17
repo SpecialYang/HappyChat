@@ -1,11 +1,9 @@
 package com.specialyang.Netty;
 
-import com.specialyang.codec.PacketDecoder;
-import com.specialyang.codec.PacketEncoder;
 import com.specialyang.codec.Spliter;
 import com.specialyang.handler.PacketCodecHandler;
-import com.specialyang.handler.client.LogoutResponseHandler;
 import com.specialyang.handler.server.*;
+import com.specialyang.serializer.SerializerInit;
 import com.specialyang.util.LogUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -15,20 +13,21 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import org.omg.PortableInterceptor.INACTIVE;
-
 /**
  * Created by Fan Yang in 2018/11/30 10:21 AM.
  */
 public class NettyServer {
 
     private final static int PORT = 8000;
+    private static String serializerName = "kryo";
+
     /**
      * 开启netty服务端
      * 需要指定三个属性：线程模型，IO模型，连接读写处理逻辑
      * @param args
      */
     public static void main(String[] args) {
+        SerializerInit.loadSpiSupport(serializerName);
         //服务端的一些初始化工作
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         //监听连接请求，建立新的连接
